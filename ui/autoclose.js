@@ -305,8 +305,8 @@ const RunningApplicationListWindow = GObject.registerClass({
             this._pidsMap = new Map();
 
             this._removeFromLayoutIfNecessary(this);
-            // Main.layoutManager.modalDialogGroup.add_actor(this);
-            // Main.layoutManager.uiGroup.add_actor(this);
+            // Main.layoutManager.modalDialogGroup.add_child(this);
+            // Main.layoutManager.uiGroup.add_child(this);
             Main.layoutManager.addChrome(this);
 
             this._confirmDialogContent = new Dialog.MessageDialogContent();
@@ -320,7 +320,7 @@ const RunningApplicationListWindow = GObject.registerClass({
             this._backgroundBin = new St.Bin({ child: this.backgroundStack });
             this._monitorConstraint = new Layout.MonitorConstraint();
             this._backgroundBin.add_constraint(this._monitorConstraint);
-            this.add_actor(this._backgroundBin);
+            this.add_child(this._backgroundBin);
 
             this.backgroundStack.add_child(this);
 
@@ -478,7 +478,7 @@ const RunningApplicationListWindow = GObject.registerClass({
             if (this._initialKeyFocus == null || isDefault)
                 this._setInitialKeyFocus(button);
 
-            this.buttonLayout.add_actor(button);
+            this.buttonLayout.add_child(button);
 
             return button;
         }

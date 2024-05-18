@@ -6,6 +6,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
+import Clutter from 'gi://Clutter';
+
 
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
@@ -294,8 +296,11 @@ class AwsIndicator extends PanelMenu.Button {
             style_class: 'session-menu-section',
             overlay_scrollbars: true
         });
-        scrollView.add_actor(this._sessionsMenuSection.actor);
-        this._scrollableSessionsMenuSection.actor.add_actor(scrollView);
+
+        // Clutter.Container was removed from Gnome 46, see:
+        // https://gjs.guide/extensions/upgrading/gnome-shell-46.html
+        scrollView[Clutter.Container ? 'add_actor' : 'set_child'](this._sessionsMenuSection.actor);
+        this._scrollableSessionsMenuSection.actor.add_child(scrollView);
 
         this.menu.addMenuItem(this._scrollableSessionsMenuSection);
     }

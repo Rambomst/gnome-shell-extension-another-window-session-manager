@@ -237,7 +237,7 @@ export const Tooltip = class Tooltip {
                 time: 0.10,
                 transition: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: () => {
-                    Main.layoutManager.uiGroup.remove_actor(this._bin);
+                    Main.layoutManager.uiGroup.remove_child(this._bin);
 
                     if (this.custom)
                         this._bin.remove_child(this.custom);
@@ -294,7 +294,7 @@ export const Tooltip = class Tooltip {
             this.custom.destroy();
 
         if (this._bin) {
-            Main.layoutManager.uiGroup.remove_actor(this._bin);
+            Main.layoutManager.uiGroup.remove_child(this._bin);
             this._bin.destroy();
         }
 
