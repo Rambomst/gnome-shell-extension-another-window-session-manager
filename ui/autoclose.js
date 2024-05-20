@@ -601,28 +601,33 @@ const RunningApplicationListWindow = GObject.registerClass({
         }
 
         _checkRunningPidState() {
-            const pidStateMap = new Map();
-            let state = new GTop.glibtop_proc_state();
-            for (const [pid, app] of this._pidsMap) {
-                GTop.glibtop_get_proc_state(state, pid);
-                // 0 has to indicate the process does not exist. See: https://developer-old.gnome.org/libgtop/stable/libgtop-procstate.html. 
-                // But I don't fully understand this page.🫣
-                const appName = app.get_name();
-                // A zombie process is in terminated state and it has completed execution.
-                // The underlying program is no longer executing, but the process remains 
-                // in the process table as a zombie process until its parent process calls 
-                // the wait system call to read its exit status, at which point the process
-                // is removed from the process table, finally ending the process's lifetime. 
-                // See: https://en.wikipedia.org/wiki/Zombie_process and https://en.wikipedia.org/wiki/Process_state#Terminated
-                if (state.state && state.state !== GTop.GLIBTOP_PROCESS_ZOMBIE) {
-                    // this._log.debug(`Process ${pid} (${appName}) is still running with state ${state.state}, waiting it to exit`)
-                    pidStateMap.set(pid, state.state);
-                } else {
-                    this._log.info(`Process ${pid} (${appName}) is exited with process state ${state.state} (${this._formatProcessState(state.state)})`);
-                    this._pidsMap.delete(pid)
+            try {
+                const pidStateMap = new Map();
+                // TODO Fixme: TypeError: GTop.glibtop_proc_state is not a constructor
+                let state = new GTop.glibtop_proc_state();
+                for (const [pid, app] of this._pidsMap) {
+                    GTop.glibtop_get_proc_state(state, pid);
+                    // 0 has to indicate the process does not exist. See: https://developer-old.gnome.org/libgtop/stable/libgtop-procstate.html. 
+                    // But I don't fully understand this page.🫣
+                    const appName = app.get_name();
+                    // A zombie process is in terminated state and it has completed execution.
+                    // The underlying program is no longer executing, but the process remains 
+                    // in the process table as a zombie process until its parent process calls 
+                    // the wait system call to read its exit status, at which point the process
+                    // is removed from the process table, finally ending the process's lifetime. 
+                    // See: https://en.wikipedia.org/wiki/Zombie_process and https://en.wikipedia.org/wiki/Process_state#Terminated
+                    if (state.state && state.state !== GTop.GLIBTOP_PROCESS_ZOMBIE) {
+                        // this._log.debug(`Process ${pid} (${appName}) is still running with state ${state.state}, waiting it to exit`)
+                        pidStateMap.set(pid, state.state);
+                    } else {
+                        this._log.info(`Process ${pid} (${appName}) is exited with process state ${state.state} (${this._formatProcessState(state.state)})`);
+                        this._pidsMap.delete(pid)
+                    }
                 }
+                return pidStateMap;
+            } catch (e) {
+                this._log.error(e, 'Failed to check pid state');
             }
-            return pidStateMap;
         }
 
         _showProcesses(pidStateMap) {
